@@ -61,7 +61,7 @@ export default {
             <Button type="button" label="Сформировать файл" icon="pi pi-search" class="prime__button"
                 @click="switchToggleProductConsigment" />
         </div>
-        <div class="consigment block-table" v-if="toggleProductConsigment">
+        <div class="consigment block-table" v-if="toggleProductConsigment && selectedProduct.length > 0">
             <div class="title">Накладная BoxBerry</div>
             <DataTable :value="selectedProduct" dataKey="id" editMode="cell" tableStyle="min-width: 50rem"
                 @cell-edit-complete="onCellEditComplete" class="prime-table">
