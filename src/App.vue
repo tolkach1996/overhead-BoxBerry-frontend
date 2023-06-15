@@ -2,29 +2,18 @@
 import { useStore } from "./stores/index"
 
 
-const store = useStore()
 export default {
+    setup() {
+        const store = useStore();
+        return { store }
+    },
     data() {
         return {
-            Order: store.Orders,
-            //Orders: [{ id: 1, name: "Заказ #1" }, { id: 2, name: "Заказ #2" }, { id: 3, name: "Заказ #3" }, { id: 4, name: "Заказ #4" }, { id: 5, name: "Заказ #5" }, { id: 6, name: "Заказ #6" }, { id: 7, name: "Заказ #7" }, { id: 8, name: "Заказ #8" }, { id: 9, name: "Заказ #9" }, { id: 10, name: "Заказ #10" }],
+            Orders: this.store.Orders,
             selectedOrders: [],
-            tableProducts: [
-                { id: 1, code: "Стр 1 Поле 1", name: "Поле 2", category: "Поле 3", quantity: "Поле 4" },
-                { id: 2, code: "Стр 2 Поле 1", name: "Поле 2", category: "Поле 3", quantity: "Поле 4" },
-                { id: 3, code: "Стр 3 Поле 1", name: "Поле 2", category: "Поле 3", quantity: "Поле 4" },
-                { id: 4, code: "Стр 4 Поле 1", name: "Поле 2", category: "Поле 3", quantity: "Поле 4" },
-                { id: 5, code: "Стр 5 Поле 1", name: "Поле 2", category: "Поле 3", quantity: "Поле 4" },
-                { id: 6, code: "Стр 6 Поле 1", name: "Поле 2", category: "Поле 3", quantity: "Поле 4" },
-            ],
-            selectedProductConsigment: [
-                { id: 1, field: "code", header: "code" },
-                { id: 1, field: "name", header: "name" },
-                { id: 1, field: "category", header: "category" },
-                { id: 1, field: "test", header: "test" },
-            ],
             selectedProduct: [],
             toggleOrders: false,
+            toggleProductConsigment: false
         }
     },
     methods: {
@@ -38,8 +27,14 @@ export default {
             }
         },
         switchToggleOrders() {
-            console.log("123")
-            this.toggleOrders = !this.toggleOrders
+            if (this.selectedOrders.length > 0) {
+                this.toggleOrders = true
+            }
+        },
+        switchToggleProductConsigment() {
+            if (this.selectedOrders.length > 0) {
+                this.toggleProductConsigment = true
+            }
         }
     },
 }
@@ -48,29 +43,51 @@ export default {
 <template>
     <div class="App">
         <div class="search">
-            <MultiSelect v-model="this.selectedOrders" :options="this.Order" filter optionLabel="name"
-                placeholder="Выберите заказ" :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
-            <Button type="button" label="Найти" icon="pi pi-search" class="prime__button" :loading="loading"
-                @click="this.toggleOrders" />
+            <MultiSelect v-model="selectedOrders" :options="Orders" filter optionLabel="name" placeholder="Выберите заказ"
+                :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
+            <Button type="button" label="Найти" icon="pi pi-search" class="prime__button" @click="switchToggleOrders" />
         </div>
-        <div class="orders block-table" v-if="this.toggleOrders">
+        <div class="orders block-table" v-if="toggleOrders">
             <div class="title">Заказы покупателей</div>
-            <DataTable v-model:selection="selectedProduct" :value="this.tableProducts" dataKey="id"
+            <DataTable v-model:selection="selectedProduct" :value="selectedOrders" dataKey="id"
                 tableStyle="min-width: 50rem" class="prime-table">
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="code" header="Code"></Column>
-                <Column field="name" header="Name"></Column>
-                <Column field="category" header="Category"></Column>
-                <Column field="quantity" header="Quantity"></Column>
+                <Column field="name" header="Имя заказа"></Column>
+                <Column field="column1" header="Колонка 1"></Column>
+                <Column field="column2" header="Колонка 2"></Column>
+                <Column field="column3" header="Колонка 3"></Column>
+                <Column field="column4" header="Колонка 4"></Column>
             </DataTable>
-            <Button type="button" label="Сформировать файл" icon="pi pi-search" class="prime__button" :loading="loading"
-                @click="load" />
+            <Button type="button" label="Сформировать файл" icon="pi pi-search" class="prime__button"
+                @click="switchToggleProductConsigment" />
         </div>
-        <div class="consigment block-table">
+        <div class="consigment block-table" v-if="toggleProductConsigment">
             <div class="title">Накладная BoxBerry</div>
-            <DataTable :value="this.tableProducts" dataKey="id" editMode="cell" tableStyle="min-width: 50rem"
-                @cell-edit-complete="this.onCellEditComplete" class="prime-table">
-                <Column field="code" header="Code">
+            <DataTable :value="selectedProduct" dataKey="id" editMode="cell" tableStyle="min-width: 50rem"
+                @cell-edit-complete="onCellEditComplete" class="prime-table">
+                <Column field="column1" header="Колонка 1">
+                    <template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template>
+                </Column>
+                <Column field="column2" header="Колонка 2">
+                    <template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template>
+                </Column>
+                <Column field="column3" header="Колонка 3">
+                    <template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template>
+                </Column>
+                <Column field="column4" header="Колонка 4">
+                    <template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template>
+                </Column>
+
+
+                <!--<Column field="code" header="Code">
                     <template #editor="slotProps">
                         <InputText v-model="slotProps.data[slotProps.column.props.field]" />
                     </template>
@@ -89,13 +106,12 @@ export default {
                     <template #editor="slotProps">
                         <InputText v-model="slotProps.data[slotProps.column.props.field]" />
                     </template>
-                </Column>
+                </Column>-->
             </DataTable>
             <div class="consigment__button">
-                <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button" :loading="loading"
-                    @click="load" />
+                <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button" @click="load" />
                 <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button"
-                    :loading="loading" @click="load" />
+                    @click="load" />
             </div>
         </div>
     </div>
