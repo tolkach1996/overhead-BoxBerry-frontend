@@ -1,6 +1,6 @@
 <script >
 import { useStore } from "./stores/index"
-
+import axios from "axios"
 
 export default {
     setup() {
@@ -13,7 +13,8 @@ export default {
             selectedOrders: [],
             selectedProduct: [],
             toggleOrders: false,
-            toggleProductConsigment: false
+            toggleProductConsigment: false,
+            urlDownload: ''
         }
     },
     methods: {
@@ -35,6 +36,24 @@ export default {
             if (this.selectedOrders.length > 0) {
                 this.toggleProductConsigment = true
             }
+        },
+        async downloadConsigmentExcel(selectedProduct) {
+            await axios.post('http://localhost:5000/downloadConsigmentExcel', {
+                data: selectedProduct
+            })
+                .then((res) => {
+                    //console.log(res)
+                    let test = res.data
+                    //console.log(test)
+                    //let blob = new Blob(test, { type: 'excel/xlsx' })
+                    //console.log(blob)
+                    let url = URL.createObjectURL(test)
+                    console.log(url)
+                })
+                .catch(function (error) { console.log(error) });
+        },
+        sendConsigmentBoxBerry() {
+            console.log('sendConsigmentBoxBerry')
         }
     },
 }
@@ -85,36 +104,16 @@ export default {
                         <InputText v-model="slotProps.data[slotProps.column.props.field]" />
                     </template>
                 </Column>
-
-
-                <!--<Column field="code" header="Code">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>
-                <Column field="name" header="Name">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>
-                <Column field="category" header="Category">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>
-                <Column field="quantity" header="quantity">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>-->
             </DataTable>
             <div class="consigment__button">
-                <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button" @click="load" />
+                <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button"
+                    @click="downloadConsigmentExcel(selectedProduct)" />
                 <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button"
-                    @click="load" />
+                    @click="sendConsigmentBoxBerry" />
             </div>
         </div>
     </div>
+    <a :href="urlDownload" v-if="urlDownload != ''" :download="urlDownload" display=none></a>
 </template>
 
 <style>
