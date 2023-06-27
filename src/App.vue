@@ -38,7 +38,21 @@ export default {
             }
         },
         async downloadConsigmentExcel(selectedProduct) {
-            await axios.post('http://localhost:5000/downloadConsigmentExcel', {
+            try {
+                const response = await axios.post('http://localhost:5000/downloadConsigmentExcel', { data: selectedProduct }, { responseType: 'blob' });
+                const { status, data } = response;
+                const href = window.URL.createObjectURL(new Blob([data]))
+                const link = document.createElement('a')
+                link.href = href
+                link.setAttribute('download', 'fileName.xlsx');
+                document.body.appendChild(link)
+                link.click()
+                link.remove()
+            }
+            catch (e) { console.log(e) }
+
+
+            /*await axios.post('http://localhost:5000/downloadConsigmentExcel', {
                 data: selectedProduct
             })
                 .then((res) => {
@@ -50,12 +64,23 @@ export default {
                     let url = URL.createObjectURL(test)
                     console.log(url)
                 })
-                .catch(function (error) { console.log(error) });
+                .catch(function (error) { console.log(error) });*/
         },
         sendConsigmentBoxBerry() {
             console.log('sendConsigmentBoxBerry')
+        },
+        async getFilterData() {
+            try {
+                const response = await axios.get('http://localhost:5000/getFilterData');
+                //const { data, project } = response;
+                console.log(response)
+            }
+            catch (e) { console.log(e) }
         }
     },
+    mounted() {
+        this.getFilterData()
+    }
 }
 </script>
 
@@ -113,7 +138,6 @@ export default {
             </div>
         </div>
     </div>
-    <a :href="urlDownload" v-if="urlDownload != ''" :download="urlDownload" display=none></a>
 </template>
 
 <style>
