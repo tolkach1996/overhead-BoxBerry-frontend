@@ -9,12 +9,15 @@ export default {
     },
     data() {
         return {
-            Orders: this.store.Orders,
+            metadata: [],
+            projects: [],
+            selectedMetadata: [],
+            selectedProjects: [],
             selectedOrders: [],
             selectedProduct: [],
             toggleOrders: false,
             toggleProductConsigment: false,
-            urlDownload: ''
+            urlDownload: '',
         }
     },
     methods: {
@@ -27,7 +30,15 @@ export default {
                     break;
             }
         },
+        async postSelectedFilters() {
+            try {
+                const response = await axios.post('http://localhost:5000/postSelectedFilters', { data: { selectedMetadata: this.selectedMetadata, selectedProjects: this.selectedProjects } })
+                console.log(response)
+            }
+            catch (e) { console.log(e) }
+        },
         switchToggleOrders() {
+            console.log(this.selectedMetadata)
             if (this.selectedOrders.length > 0) {
                 this.toggleOrders = true
             }
@@ -50,21 +61,6 @@ export default {
                 link.remove()
             }
             catch (e) { console.log(e) }
-
-
-            /*await axios.post('http://localhost:5000/downloadConsigmentExcel', {
-                data: selectedProduct
-            })
-                .then((res) => {
-                    //console.log(res)
-                    let test = res.data
-                    //console.log(test)
-                    //let blob = new Blob(test, { type: 'excel/xlsx' })
-                    //console.log(blob)
-                    let url = URL.createObjectURL(test)
-                    console.log(url)
-                })
-                .catch(function (error) { console.log(error) });*/
         },
         sendConsigmentBoxBerry() {
             console.log('sendConsigmentBoxBerry')
@@ -72,8 +68,8 @@ export default {
         async getFilterData() {
             try {
                 const response = await axios.get('http://localhost:5000/getFilterData');
-                //const { data, project } = response;
-                console.log(response)
+                this.metadata = response.data.metadata
+                this.projects = response.data.projects
             }
             catch (e) { console.log(e) }
         }
@@ -87,9 +83,11 @@ export default {
 <template>
     <div class="App">
         <div class="search">
-            <MultiSelect v-model="selectedOrders" :options="Orders" filter optionLabel="name" placeholder="Выберите заказ"
-                :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
-            <Button type="button" label="Найти" icon="pi pi-search" class="prime__button" @click="switchToggleOrders" />
+            <MultiSelect v-model="selectedProjects" :options="projects" filter optionLabel="name"
+                placeholder="Выберите проект" :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
+            <MultiSelect v-model="selectedMetadata" :options="metadata" filter optionLabel="name"
+                placeholder="Выберите статус" :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
+            <Button type="button" label="Найти" icon="pi pi-search" class="prime__button" @click="postSelectedFilters" />
         </div>
         <div class="orders block-table" v-if="toggleOrders">
             <div class="title">Заказы покупателей</div>
