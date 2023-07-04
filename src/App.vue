@@ -13,6 +13,7 @@ export default {
             projects: [],
             selectedMetadata: [],
             selectedProjects: [],
+            table: [],
             selectedOrders: [],
             selectedProduct: [],
             toggleOrders: false,
@@ -33,7 +34,8 @@ export default {
         async postSelectedFilters() {
             try {
                 const response = await axios.post('http://localhost:5000/postSelectedFilters', { data: { selectedMetadata: this.selectedMetadata, selectedProjects: this.selectedProjects } })
-                console.log(response)
+                this.table = response.data
+                console.log(this.table)
             }
             catch (e) { console.log(e) }
         },
@@ -89,21 +91,55 @@ export default {
                 placeholder="Выберите статус" :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
             <Button type="button" label="Найти" icon="pi pi-search" class="prime__button" @click="postSelectedFilters" />
         </div>
-        <div class="orders block-table" v-if="toggleOrders">
+        <div class="orders block-table" v-if="table.length > 0">
             <div class="title">Заказы покупателей</div>
-            <DataTable v-model:selection="selectedProduct" :value="selectedOrders" dataKey="id"
-                tableStyle="min-width: 50rem" class="prime-table">
-                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="name" header="Имя заказа"></Column>
-                <Column field="column1" header="Колонка 1"></Column>
-                <Column field="column2" header="Колонка 2"></Column>
-                <Column field="column3" header="Колонка 3"></Column>
-                <Column field="column4" header="Колонка 4"></Column>
+            <DataTable editMode="cell" v-model:selection="selectedProduct" :value="table" dataKey="name"
+                tableStyle="min-width: 50rem" class="prime-table" @cell-edit-complete="onCellEditComplete">
+                <!--<Column selectionMode="multiple" headerStyle="width: 3rem"></Column>-->
+                <Column field="dataPackage" header="Дата посылки (ГГГГММДД)"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="number" header="Номер заказа в ИМ"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="declaredSum" header="Объявленная стоимость"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="paySum" header="Сумма к оплате"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="deliverySum" header="Стоимость доставки"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="dataTransfer" header="Дата передачи ЗП"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="typeTransfer" header="Вид доставки"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="codePWZ" header="Код ПВЗ"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="departurePointCode" header="Код пункта поступления"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="fio" header="ФИО"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
+                <Column field="phone" header="Номер телефона"><template #editor="slotProps">
+                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
+                    </template></Column>
             </DataTable>
-            <Button type="button" label="Сформировать файл" icon="pi pi-search" class="prime__button"
-                @click="switchToggleProductConsigment" />
+            <div class="consigment__button">
+                <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button"
+                    @click="downloadConsigmentExcel(selectedProduct)" />
+                <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button"
+                    @click="sendConsigmentBoxBerry" />
+            </div>
+            <!--<Button type="button" label="Сформировать файл" icon="pi pi-search" class="prime__button"
+                @click="switchToggleProductConsigment" />-->
         </div>
-        <div class="consigment block-table" v-if="toggleProductConsigment && selectedProduct.length > 0">
+        <!--<div class="consigment block-table" v-if="toggleProductConsigment && selectedProduct.length > 0">
             <div class="title">Накладная BoxBerry</div>
             <DataTable :value="selectedProduct" dataKey="id" editMode="cell" tableStyle="min-width: 50rem"
                 @cell-edit-complete="onCellEditComplete" class="prime-table">
@@ -134,7 +170,7 @@ export default {
                 <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button"
                     @click="sendConsigmentBoxBerry" />
             </div>
-        </div>
+        </div>-->
     </div>
 </template>
 
