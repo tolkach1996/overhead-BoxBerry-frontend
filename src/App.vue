@@ -80,6 +80,7 @@ export default {
         this.getFilterData()
     }
 }
+
 </script>
 
 <template>
@@ -89,7 +90,8 @@ export default {
                 placeholder="Выберите проект" :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
             <MultiSelect v-model="selectedMetadata" :options="metadata" filter optionLabel="name"
                 placeholder="Выберите статус" :maxSelectedLabels="3" class="prime__multiselect w-full md:w-20rem" />
-            <Button type="button" label="Найти" icon="pi pi-search" class="prime__button" @click="postSelectedFilters" />
+            <Button type="button" label="Найти" icon="pi pi-search" class="prime__button" :loading="loading"
+                @click="postSelectedFilters" />
         </div>
         <div class="orders block-table" v-if="table.length > 0">
             <div class="title">Заказы покупателей</div>
@@ -179,6 +181,7 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 55px;
+    min-width: 100%;
 }
 
 .search {
