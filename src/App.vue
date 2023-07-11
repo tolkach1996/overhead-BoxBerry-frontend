@@ -14,11 +14,7 @@ export default {
             selectedMetadata: [],
             selectedProjects: [],
             table: [],
-            selectedOrders: [],
-            selectedProduct: [],
-            toggleOrders: false,
-            toggleProductConsigment: false,
-            urlDownload: '',
+            selectedOrder: []
         }
     },
     methods: {
@@ -31,6 +27,13 @@ export default {
                     break;
             }
         },
+        onRowEditSave(event) {
+            //console.log(event.data)
+            let { newData, index } = event;
+            console.log(newData)
+            console.log(index)
+            this.table[index] = newData;
+        },
         async postSelectedFilters() {
             try {
                 const response = await axios.post('http://localhost:5000/postSelectedFilters', { data: { selectedMetadata: this.selectedMetadata, selectedProjects: this.selectedProjects } })
@@ -39,20 +42,9 @@ export default {
             }
             catch (e) { console.log(e) }
         },
-        switchToggleOrders() {
-            console.log(this.selectedMetadata)
-            if (this.selectedOrders.length > 0) {
-                this.toggleOrders = true
-            }
-        },
-        switchToggleProductConsigment() {
-            if (this.selectedOrders.length > 0) {
-                this.toggleProductConsigment = true
-            }
-        },
-        async downloadConsigmentExcel(selectedProduct) {
+        async downloadConsigmentExcel() {
             try {
-                const response = await axios.post('http://localhost:5000/downloadConsigmentExcel', { data: selectedProduct }, { responseType: 'blob' });
+                const response = await axios.post('http://localhost:5000/downloadConsigmentExcel', { data: this.table }, { responseType: 'blob' });
                 const { status, data } = response;
                 const href = window.URL.createObjectURL(new Blob([data]))
                 const link = document.createElement('a')
@@ -95,9 +87,77 @@ export default {
         </div>
         <div class="orders block-table" v-if="table.length > 0">
             <div class="title">Заказы покупателей</div>
-            <DataTable editMode="cell" v-model:selection="selectedProduct" :value="table" dataKey="name"
+            <DataTable v-model:editingRows="selectedOrder" :value="table" editMode="row" dataKey="number"
+                @row-edit-save="onRowEditSave" tableClass="editable-cells-table" tableStyle="min-width: 50rem">
+                <Column field="dataPackage" header="Дата посылки (ГГГГММДД)">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="number" header="Номер заказа в ИМ">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="declaredSum" header="Объявленная стоимость">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="paySum" header="Сумма к оплате">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="deliverySum" header="Стоимость доставки">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="dataTransfer" header="Дата передачи ЗП">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="typeTransfer" header="Вид доставки">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="codePWZ" header="Код ПВЗ">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="departurePointCode" header="Код пункта поступления">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="fio" header="ФИО">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="phone" header="Номер телефона">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column field="weightPackage" header="Вес 1-ого места">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+                <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+            </DataTable>
+
+
+
+
+            <!--<DataTable editMode="cell" v-model:selection="selectedProduct" :value="table" dataKey="name"
                 tableStyle="min-width: 50rem" class="prime-table" @cell-edit-complete="onCellEditComplete">
-                <!--<Column selectionMode="multiple" headerStyle="width: 3rem"></Column>-->
+                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                 <Column field="dataPackage" header="Дата посылки (ГГГГММДД)"><template #editor="slotProps">
                         <InputText v-model="slotProps.data[slotProps.column.props.field]" />
                     </template></Column>
@@ -131,48 +191,14 @@ export default {
                 <Column field="phone" header="Номер телефона"><template #editor="slotProps">
                         <InputText v-model="slotProps.data[slotProps.column.props.field]" />
                     </template></Column>
-            </DataTable>
+            </DataTable>-->
             <div class="consigment__button">
                 <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button"
-                    @click="downloadConsigmentExcel(selectedProduct)" />
+                    @click="downloadConsigmentExcel()" />
                 <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button"
                     @click="sendConsigmentBoxBerry" />
             </div>
-            <!--<Button type="button" label="Сформировать файл" icon="pi pi-search" class="prime__button"
-                @click="switchToggleProductConsigment" />-->
         </div>
-        <!--<div class="consigment block-table" v-if="toggleProductConsigment && selectedProduct.length > 0">
-            <div class="title">Накладная BoxBerry</div>
-            <DataTable :value="selectedProduct" dataKey="id" editMode="cell" tableStyle="min-width: 50rem"
-                @cell-edit-complete="onCellEditComplete" class="prime-table">
-                <Column field="column1" header="Колонка 1">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>
-                <Column field="column2" header="Колонка 2">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>
-                <Column field="column3" header="Колонка 3">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>
-                <Column field="column4" header="Колонка 4">
-                    <template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template>
-                </Column>
-            </DataTable>
-            <div class="consigment__button">
-                <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button"
-                    @click="downloadConsigmentExcel(selectedProduct)" />
-                <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button"
-                    @click="sendConsigmentBoxBerry" />
-            </div>
-        </div>-->
     </div>
 </template>
 
