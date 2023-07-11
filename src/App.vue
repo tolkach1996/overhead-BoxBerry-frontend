@@ -28,10 +28,7 @@ export default {
             }
         },
         onRowEditSave(event) {
-            //console.log(event.data)
             let { newData, index } = event;
-            console.log(newData)
-            console.log(index)
             this.table[index] = newData;
         },
         async postSelectedFilters() {
@@ -151,47 +148,6 @@ export default {
                 </Column>
                 <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
             </DataTable>
-
-
-
-
-            <!--<DataTable editMode="cell" v-model:selection="selectedProduct" :value="table" dataKey="name"
-                tableStyle="min-width: 50rem" class="prime-table" @cell-edit-complete="onCellEditComplete">
-                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="dataPackage" header="Дата посылки (ГГГГММДД)"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="number" header="Номер заказа в ИМ"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="declaredSum" header="Объявленная стоимость"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="paySum" header="Сумма к оплате"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="deliverySum" header="Стоимость доставки"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="dataTransfer" header="Дата передачи ЗП"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="typeTransfer" header="Вид доставки"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="codePWZ" header="Код ПВЗ"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="departurePointCode" header="Код пункта поступления"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="fio" header="ФИО"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-                <Column field="phone" header="Номер телефона"><template #editor="slotProps">
-                        <InputText v-model="slotProps.data[slotProps.column.props.field]" />
-                    </template></Column>
-            </DataTable>-->
             <div class="consigment__button">
                 <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button"
                     @click="downloadConsigmentExcel()" />
