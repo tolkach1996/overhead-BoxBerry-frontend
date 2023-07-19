@@ -151,7 +151,12 @@ export default {
             }
             catch (e) { console.log(e) }
         },
-        sendConsigmentBoxBerry() {
+        async sendConsigmentBoxBerry() {
+            try {
+                const response = await axios.post('http://localhost:5000/sendConsigmentBoxBerry', { data: this.table })
+                console.log(response)
+            }
+            catch (e) { console.log(e) }
             console.log('sendConsigmentBoxBerry')
         },
         async getFilterData() {
