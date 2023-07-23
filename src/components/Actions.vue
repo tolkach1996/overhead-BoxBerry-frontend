@@ -1,5 +1,13 @@
 <script>
 export default {
+    props: {
+        loadingDownloadExcel: {
+            type: Boolean
+        },
+        loadingSendBoxberry: {
+            type: Boolean
+        },
+    },
     data() {
         return {
             table: [],
@@ -9,10 +17,10 @@ export default {
     },
     methods: {
         loadConsigmentExcel() {
-            this.$emit('loadConsigmentExcel')
+            this.$emit('loadConsigmentExcel');
         },
         pushConsigmentBoxBerry() {
-            this.$emit('pushConsigmentBoxBerry')
+            this.$emit('pushConsigmentBoxBerry');
         },
     },
 }
@@ -20,10 +28,10 @@ export default {
 
 <template>
     <div class="actions">
-        <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button"
-            @click="loadConsigmentExcel" />
+        <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button" @click="loadConsigmentExcel"
+            :loading="loadingDownloadExcel" />
         <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button"
-            @click="pushConsigmentBoxBerry" />
+            @click="pushConsigmentBoxBerry" :loading="loadingSendBoxberry" />
     </div>
 </template>
 

@@ -1,4 +1,4 @@
-import httpClient from "./client"
+import httpClient from "./client";
 
 
 export const selectedFilters = async (filters) => {
@@ -11,9 +11,9 @@ export const getFilterData = async () => {
 }
 
 export const downloadConsigmentExcel = async (table) => {
-    return await httpClient.post('/excel/download', { data: table }, { responseType: 'blob' })
+    return await httpClient.post('/excel/download', { data: table }, { responseType: 'blob' });
 }
 
 export const sendConsigmentBoxBerry = async (table) => {
-    return await httpClient.post('/boxberry/consigment', { data: table })
+    return await httpClient.post('/boxberry/consigment', { data: table });
 }
