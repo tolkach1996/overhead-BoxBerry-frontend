@@ -46,6 +46,9 @@ export default {
         },
         async pushConsigmentBoxBerry() {
             this.loadingSendBoxberry = true;
+            for (let item of this.table) {
+                item.reqStatus = ''
+            }
             try {
                 const res = await sendConsigmentBoxBerry(this.table);
                 let index = 0;
