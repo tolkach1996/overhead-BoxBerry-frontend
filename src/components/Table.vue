@@ -92,12 +92,24 @@ export default {
             scrollable tableClass="editable-cells-table" editMode="row" @row-edit-save="onRowEditSave"
             tableStyle="min-width: 100%" :rowStyle="rowStyle">
             <Column expander />
+            <Column header="№" field="index">
+            </Column>
             <Column field="fio" header="ФИО">
                 <template #editor="{ data, field }">
                     <InputText class="table-input-stile1" v-model="data[field]" />
                 </template>
             </Column>
             <Column field="phone" header="Номер телефона">
+                <template #editor="{ data, field }">
+                    <InputText class="table-input-stile2" v-model="data[field]" />
+                </template>
+            </Column>
+            <Column field="number" header="Номер Заказа">
+                <template #editor="{ data, field }">
+                    <InputText class="table-input-stile2" v-model="data[field]" />
+                </template>
+            </Column>
+            <Column field="sum" header="Общая стоимость">
                 <template #editor="{ data, field }">
                     <InputText class="table-input-stile2" v-model="data[field]" />
                 </template>
@@ -135,6 +147,8 @@ export default {
             </Column>
             <Column field="reqStatus" header="Текст Ошибки">
             </Column>
+            <Column :rowEditor="true" style="width: 5%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+            <Column style="width: 5%; min-width: 8rem" bodyStyle="text-align:center">123</Column>
             <template #expansion="orders">
                 <div class="p-3">
                     <h5>Заказы {{ orders.data.fio }}</h5>
@@ -143,7 +157,12 @@ export default {
                         tableStyle="min-width: 100%">
                         <Column field="number" header="Номер заказа в ИМ">
                             <template #editor="{ data, field }">
-                                <InputText class="table-input-stile3" v-model="data[field]" />
+                                <InputText class="table-input-stile2" v-model="data[field]" />
+                            </template>
+                        </Column>
+                        <Column field="project" header="Проект">
+                            <template #editor="{ data, field }">
+                                <InputText class="table-input-stile2" v-model="data[field]" />
                             </template>
                         </Column>
                         <Column field="declaredSum" header="Объявленная стоимость">
@@ -161,7 +180,7 @@ export default {
                     </DataTable>
                 </div>
             </template>
-            <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+
         </DataTable>
         <Actions @loadConsigmentExcel="loadConsigmentExcel" @pushConsigmentBoxBerry="pushConsigmentBoxBerry"
             :loadingDownloadExcel="loadingDownloadExcel" :loadingSendBoxberry="loadingSendBoxberry">

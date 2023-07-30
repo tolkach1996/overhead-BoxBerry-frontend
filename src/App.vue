@@ -3,9 +3,10 @@ import Search from './components/Search.vue';
 import Table from './components/Table.vue';
 import { selectedFilters } from "./api/Service";
 import Modal from './components/Modal.vue'
+import test from './components/test.vue'
 
 export default {
-    components: { Search, Table, Modal },
+    components: { Search, Table, Modal, test },
     data() {
         return {
             table: [],
@@ -27,6 +28,11 @@ export default {
                 this.loadingSearch = true;
                 const res = await selectedFilters(filters);
                 this.table = res;
+                let i = 1;
+                for (let item of this.table) {
+                    item.index = i;
+                    i++;
+                }
                 this.loadingSearch = false;
             }
             catch (e) { console.log(e) }
@@ -40,18 +46,13 @@ export default {
             this.modalVisible = true;
             this.modalError = true;
         },
-        /*reqStatus() {
-            this.table = this.table.map(item => {
-                item.reqStatus = ''
-                return item
-            })
-        }*/
     }
 }
 </script>
 
 <template>
     <Search @postSelectedFilters="postSelectedFilters" :loadingSearch="loadingSearch"></Search>
+    <test :table="table"></test>
     <Table :table="table" @swithModalError="swithModalError"></Table>
     <Modal v-model:show="modalVisible" @click="hideModal">
         <slot v-if="modalSearch">
