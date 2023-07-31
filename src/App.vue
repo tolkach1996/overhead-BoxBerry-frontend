@@ -1,11 +1,14 @@
-<script >
-import Search from './components/Search.vue';
-import Table from './components/Table.vue';
-import { selectedFilters } from "./api/Service";
-import Modal from './components/Modal.vue'
-import test from './components/test.vue'
+<script setup>
+    import Search from './components/Search.vue';
+    import Table from './components/Table.vue';
+    import ModalWindow from './components/ModalWindow.vue'
+    import test from './components/test.vue'
 
-export default {
+    import { useApp } from './hooks/useApp';
+
+    const { textError, toggleModalWindow, isShowModal, orders } = useApp;
+
+/* export default {
     components: { Search, Table, Modal, test },
     data() {
         return {
@@ -56,21 +59,16 @@ export default {
             }
         },
     }
-}
+} */
 </script>
 
 <template>
-    <Search @postSelectedFilters="postSelectedFilters" :loadingSearch="loadingSearch"></Search>
-    <test :table="table" @swithModalError="swithModalError" v-if="this.table.length > 0" @deliteOrder="deliteOrder"></test>
-    <!--<Table :table="table" @swithModalError="swithModalError"></Table>-->
-    <Modal v-model:show="modalVisible" @click="hideModal">
-        <slot v-if="modalSearch">
-            Выберите все фильтры!
-        </slot>
-        <slot v-if="modalError">
-            Ошибка сервера!
-        </slot>
-    </Modal>
+    <Search />
+    <!-- <test :table="table" @swithModalError="swithModalError" v-if="this.table.length > 0" @deliteOrder="deliteOrder"></test> -->
+    <Table :table="orders" @swithModalError="swithModalError"></Table>
+    <ModalWindow :show="isShowModal" @click="toggleModalWindow">
+        {{ textError }}
+    </ModalWindow>
 </template>
 
 <style></style>

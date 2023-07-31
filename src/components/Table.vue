@@ -86,7 +86,7 @@ export default {
 </script>
 
 <template>
-    <div class="table" v-if="table.length > 0">
+    <div class="table" v-if="table">
         <div class="title">Заказы покупателей</div>
         <DataTable v-model:expandedRows="expandedRows" v-model:editingRows="selectedOrder" :value="table" dataKey="phone"
             scrollable tableClass="editable-cells-table" editMode="row" @row-edit-save="onRowEditSave"

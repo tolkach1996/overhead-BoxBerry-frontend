@@ -1,9 +1,8 @@
 import httpClient from "./client";
 
 
-export const selectedFilters = async (filters) => {
-    let { selectedMetadata, selectedProjects } = filters;
-    return await httpClient.post('/ms/orders', { data: { selectedMetadata: selectedMetadata, selectedProjects: selectedProjects } })
+export const fetchOrdersByFilters = async (selectedProjects, selectedMetadata) => {
+    return await httpClient.post('/ms/orders', { selectedMetadata, selectedProjects });
 }
 
 export const getFilterData = async () => {
