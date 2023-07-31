@@ -18,6 +18,7 @@ export default {
     },
     methods: {
         async postSelectedFilters(filters) {
+            this.table = []
             const { selectedMetadata, selectedProjects } = filters
             if (selectedMetadata.length == 0 || selectedProjects.length == 0) {
                 this.modalVisible = true;
@@ -46,14 +47,22 @@ export default {
             this.modalVisible = true;
             this.modalError = true;
         },
+        deliteOrder(String) {
+            this.table = this.table.filter(item => item.index !== String.index)
+            let i = 1
+            for (let item of this.table) {
+                item.index = i
+                i++
+            }
+        },
     }
 }
 </script>
 
 <template>
     <Search @postSelectedFilters="postSelectedFilters" :loadingSearch="loadingSearch"></Search>
-    <test :table="table"></test>
-    <Table :table="table" @swithModalError="swithModalError"></Table>
+    <test :table="table" @swithModalError="swithModalError" v-if="this.table.length > 0" @deliteOrder="deliteOrder"></test>
+    <!--<Table :table="table" @swithModalError="swithModalError"></Table>-->
     <Modal v-model:show="modalVisible" @click="hideModal">
         <slot v-if="modalSearch">
             Выберите все фильтры!
