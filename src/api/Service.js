@@ -1,9 +1,8 @@
 import httpClient from "./client";
 
 
-export const selectedFilters = async (filters) => {
-    let { selectedMetadata, selectedProjects } = filters;
-    return await httpClient.post('/ms/orders', { data: { selectedMetadata: selectedMetadata, selectedProjects: selectedProjects } })
+export const fetchOrdersByFilters = async (selectedProjects, selectedMetadata) => {
+    return await httpClient.post('/ms/orders', { selectedMetadata, selectedProjects });
 }
 
 export const getFilterData = async () => {
@@ -16,4 +15,16 @@ export const downloadConsigmentExcel = async (table) => {
 
 export const sendConsigmentBoxBerry = async (table) => {
     return await httpClient.post('/boxberry/consigment', { data: table });
+}
+
+export const fetchAllCities = async () => {
+    return httpClient.get('/cities');
+}
+
+export const updateOneById = async (id, payload) => {
+    return httpClient.patch(`/cities/${id}`, payload);
+}
+
+export const downloadPricelist = async () => {
+    return httpClient.get('/excel/price-list', { responseType: 'blob' });
 }

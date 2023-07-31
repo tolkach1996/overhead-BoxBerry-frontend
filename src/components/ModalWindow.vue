@@ -18,12 +18,12 @@ export default {
     <div class="modal" v-if="show">
         <div class="content">
             <slot></slot>
-            <Button type="button" label="Ок" icon="pi pi-search" class="prime__button" @click="hideDialog" />
+            <Button type="button" label="Закрыть" class="prime__button" @click="hideDialog" />
         </div>
     </div>
 </template>
 
-<style>
+<style scoped>
 .modal {
     top: 0;
     bottom: 0;
@@ -32,6 +32,7 @@ export default {
     background-color: rgba(1, 1, 1, 0.5);
     position: fixed;
     display: flex;
+    z-index: 2;
 }
 
 .content {

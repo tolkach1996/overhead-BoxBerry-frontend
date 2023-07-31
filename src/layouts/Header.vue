@@ -1,0 +1,40 @@
+<template>
+    <header class="header">
+        <nav class="header-menu">
+            <RouterLink :to="{ name: 'Main' }" class="link">
+                <div class="header-menu__item">Выгрузка в BoxBerry</div>
+            </RouterLink>
+            <RouterLink :to="{ name: 'Cities' }" class="link">
+                <div class="header-menu__item">Стоимость доставки</div>
+            </RouterLink>
+        </nav>
+    </header>
+</template>
+
+<script setup>
+    import { RouterLink } from 'vue-router';
+</script>
+
+<style lang="scss" scoped>
+    .header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0px 40px;
+        background-color: white;
+        box-shadow: 0px 2px 5px 1px rgb(3, 3, 3, 0.1);
+        min-height: 70px;
+        height: 70px;
+
+        &-menu {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 20px;
+
+            &__item {
+                font-size: 16px;
+            }
+        }
+    }
+</style>
