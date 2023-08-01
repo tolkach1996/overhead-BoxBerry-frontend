@@ -2,7 +2,6 @@ import { createApp } from 'vue';
 import './style.css';
 import App from './App.vue';
 import PrimeVue from 'primevue/config';
-import { createPinia } from 'pinia';
 
 
 import MultiSelect from 'primevue/multiselect';
@@ -19,7 +18,6 @@ import 'primevue/resources/primevue.min.css';
 const app = createApp(App);
 
 app.use(PrimeVue);
-app.use(createPinia());
 
 app.component('MultiSelect', MultiSelect);
 app.component('Button', Button);

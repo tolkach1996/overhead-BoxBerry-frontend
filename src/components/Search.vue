@@ -15,40 +15,6 @@
     onMounted(async () => {
         await fetchFilter();
     });
-
-/* import { getFilterData } from "../api/Service";
-
-export default {
-    props: {
-        loadingSearch: {
-            type: Boolean
-        },
-    },
-    data() {
-        return {
-            metadata: [],
-            projects: [],
-            selectedMetadata: [],
-            selectedProjects: [],
-        }
-    },
-    methods: {
-        postSelectedFilters() {
-            this.$emit('postSelectedFilters', { selectedMetadata: this.selectedMetadata, selectedProjects: this.selectedProjects });
-        },
-        async filterData() {
-            try {
-                const data = await getFilterData();
-                this.metadata = data.metadata;
-                this.projects = data.projects;
-            }
-            catch (e) { console.log(e) }
-        },
-    },
-    mounted() {
-        this.filterData();
-    }
-} */
 </script>
 
 <template>

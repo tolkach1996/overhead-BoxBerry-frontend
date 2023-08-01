@@ -3,14 +3,17 @@ import { getFilterData, fetchOrdersByFilters } from '../api/Service';
 
 const app = () => {
     const isLoadingSearch = ref(false);
+    const isLoadingDownloadExcel = ref(false);
+    const isLoadingSendBoxberry = ref(false);
+
     const textError = ref(null);
     const isShowModal = ref(false);
 
     const filterProject = ref(null);
     const filterStatus = ref(null);
 
-    const selectedFilterProjects = ref(null);
-    const selectedFilterStatus = ref(null);
+    const selectedFilterProjects = ref([]);
+    const selectedFilterStatus = ref([]);
 
     const orders = ref(null);
 
@@ -31,9 +34,9 @@ const app = () => {
     }
     async function searchData() {
         isLoadingSearch.value = true;
+        orders.value = null;
         try {
-
-            if (!selectedFilterProjects.value || !selectedFilterStatus.value) {
+            if (!selectedFilterProjects.value.length || !selectedFilterStatus.value.length) {
                 textError.value = 'Не выбран один из фильтров';
                 isShowModal.value = true;
             } else {
@@ -41,11 +44,35 @@ const app = () => {
                 orders.value = data;
             }
         } catch(e) {
-            console.error(e);
             textError.value = e?.response?.data?.message || e?.message || 'Ошибка сервера';
             isShowModal.value = true;
         } finally {
             isLoadingSearch.value = false;
+        }
+    }
+
+    async function downloadExcel() {
+        isLoadingDownloadExcel.value = true;
+        
+        try {
+
+        } catch(e) {
+            textError.value = e?.response?.data?.message || e?.message || 'Ошибка сервера';
+            isShowModal.value = true;
+        } finally {
+            isLoadingDownloadExcel.value = false
+        }
+    }
+    async function sendBoxberry() {
+        isLoadingSendBoxberry.value = true;
+
+        try {
+
+        } catch(e) {
+            textError.value = e?.response?.data?.message || e?.message || 'Ошибка сервера';
+            isShowModal.value = true;
+        } finally {
+            isLoadingSendBoxberry.value = false;
         }
     }
 
