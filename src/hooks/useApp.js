@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { getFilterData, fetchOrdersByFilters } from '../api/Service';
+import { getFilterData, fetchOrdersByFilters, downloadConsigmentExcel, sendConsigmentBoxBerry } from '../api/Service';
 
 const app = () => {
     const isLoadingSearch = ref(false);
@@ -26,7 +26,7 @@ const app = () => {
             const { metadata, projects } = await getFilterData();
             filterProject.value = projects;
             filterStatus.value = metadata;
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             textError.value = e?.message || 'Ошибка сервера';
             isShowModal.value = true;
@@ -43,7 +43,7 @@ const app = () => {
                 const data = await fetchOrdersByFilters(selectedFilterProjects.value, selectedFilterStatus.value);
                 orders.value = data;
             }
-        } catch(e) {
+        } catch (e) {
             textError.value = e?.response?.data?.message || e?.message || 'Ошибка сервера';
             isShowModal.value = true;
         } finally {
@@ -53,10 +53,16 @@ const app = () => {
 
     async function downloadExcel() {
         isLoadingDownloadExcel.value = true;
-        
         try {
-
-        } catch(e) {
+            const data = await downloadConsigmentExcel(orders.value);
+            const href = window.URL.createObjectURL(new Blob([data]));
+            const link = document.createElement('a');
+            link.href = href;
+            link.setAttribute('download', 'fileName.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (e) {
             textError.value = e?.response?.data?.message || e?.message || 'Ошибка сервера';
             isShowModal.value = true;
         } finally {
@@ -65,10 +71,23 @@ const app = () => {
     }
     async function sendBoxberry() {
         isLoadingSendBoxberry.value = true;
-
+        for (let item of orders.value) {
+            item.reqStatus = ''
+        }
         try {
+            const res = await sendConsigmentBoxBerry(orders.value);
+            let index = 0;
+            for (let item of orders.value) {
+                if (res[index].res == 'Ок') {
+                    item.reqStatus = res[index].res
+                }
+                else {
+                    item.reqStatus = res[index].err
+                }
+                index++;
+            }
 
-        } catch(e) {
+        } catch (e) {
             textError.value = e?.response?.data?.message || e?.message || 'Ошибка сервера';
             isShowModal.value = true;
         } finally {
@@ -82,12 +101,16 @@ const app = () => {
         textError,
         isShowModal,
         isLoadingSearch,
+        isLoadingDownloadExcel,
+        isLoadingSendBoxberry,
         selectedFilterProjects,
         selectedFilterStatus,
         orders,
         toggleModalWindow,
         fetchFilter,
-        searchData
+        searchData,
+        downloadExcel,
+        sendBoxberry,
     }
 }
 

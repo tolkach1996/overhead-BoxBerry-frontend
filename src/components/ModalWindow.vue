@@ -32,6 +32,7 @@ export default {
     background-color: rgba(1, 1, 1, 0.5);
     position: fixed;
     display: flex;
+    z-index: 2;
 }
 
 .content {
