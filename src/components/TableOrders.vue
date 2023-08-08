@@ -1,5 +1,5 @@
 <template>
-    <div class="table" v-if="orders">
+    <Table v-if="orders">
         <Row class="row_header">
             <Column></Column>
             <Column>№</Column>
@@ -9,7 +9,7 @@
             <Column>Телефон</Column>
             <Column align="right">Сумма заказа</Column>
             <Column>Комментарий</Column>
-            <Column>Дата посылки (ГГГГММДД)</Column>
+            <Column>Дата посылки</Column>
             <Column align="center">Вид доставки</Column>
             <Column align="right">Стоимость доставки</Column>
             <Column align="right">Оплата доставки</Column>
@@ -97,85 +97,54 @@
                 </Row>
             </template>
         </template>
-    </div>
+    </Table>
 </template>
 
 <script setup>
-import Row from './Row/Row.vue';
-import Column from './Column/Column.vue';
-import { ArrowRightIcon, DeleteIcon, EditIcon, SaveIcon } from '../Icons';
-import { useApp } from '../../hooks/useApp';
-const { orders } = useApp;
+    import { Table, Row, Column } from './Table';
+    import { ArrowRightIcon, DeleteIcon, EditIcon, SaveIcon } from './Icons';
+    import { useApp } from '../hooks/useApp';
+    const { orders } = useApp;
 
-function toggleRow(row) {
-    row.show = !row.show;
-}
-function removeItem(index, subIndex = null) {
-    if (subIndex !== null) {
-        const deleted = orders.value[index].orders.splice(subIndex, 1);
-        if (orders.value[index].id === deleted[0].id) {
-            // Если удалили из заказов, тот, который основной, то основной должны изменить
-            Object.keys(orders.value[index].orders[0]).map(key => {
-                orders.value[index][key] = orders.value[index].orders[0][key];
-            })
-        }
-        if (orders.value[index].orders.length === 1) {
-            orders.value[index].show = false;
-        }
-        return;
+    function toggleRow(row) {
+        row.show = !row.show;
     }
-    orders.value.splice(index, 1);
-}
-function toggleEditRow(index, subIndex = null) {
-    if (subIndex !== null) {
-        return orders.value[index].orders[subIndex].isEdit = !orders.value[index].orders[subIndex].isEdit;
+    function removeItem(index, subIndex = null) {
+        if (subIndex !== null) {
+            const deleted = orders.value[index].orders.splice(subIndex, 1);
+            if (orders.value[index].id === deleted[0].id) {
+                // Если удалили из заказов, тот, который основной, то основной должны изменить
+                Object.keys(orders.value[index].orders[0]).map(key => {
+                    orders.value[index][key] = orders.value[index].orders[0][key];
+                })
+            }
+            if (orders.value[index].orders.length === 1) {
+                orders.value[index].show = false;
+            }
+            return;
+        }
+        orders.value.splice(index, 1);
     }
-    return orders.value[index].isEdit = !orders.value[index].isEdit;
-}
+    function toggleEditRow(index, subIndex = null) {
+        if (subIndex !== null) {
+            return orders.value[index].orders[subIndex].isEdit = !orders.value[index].orders[subIndex].isEdit;
+        }
+        return orders.value[index].isEdit = !orders.value[index].isEdit;
+    }
 
-function summarizeAmount(array) {
-    if (array.length > 1) {
-        return array.reduce((pre, cur) => {
-            return pre += cur.sumOrder;
-        }, 0)
+    function summarizeAmount(array) {
+        if (array.length > 1) {
+            return array.reduce((pre, cur) => {
+                return pre += cur.sumOrder;
+            }, 0)
+        }
+        return array[0].sumOrder;
     }
-    return array[0].sumOrder;
-}
-function summarizeDeclared(amount) {
-    return amount > 10000 ? amount : 5;
-}
-function className(item) {
-    if (!item.reqStatus) return null;
-    return item.reqStatus == "Ок" ? 'succefully' : 'warning'
-}
+    function summarizeDeclared(amount) {
+        return amount > 10000 ? amount : 5;
+    }
+    function className(item) {
+        if (!item.reqStatus) return null;
+        return item.reqStatus == "Ок" ? 'succefully' : 'warning'
+    }
 </script>
-
-<style lang="scss" scoped>
-.table {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-
-    &__input {
-        width: 100%;
-        border: 1px solid gray;
-        border-radius: 4px;
-        height: 25px;
-
-    }
-}
-
-.arrow-bottom {
-    transform: rotate(90deg);
-}
-
-.succefully {
-    background-color: #00C200;
-}
-
-.warning {
-    background-color: #FF5555;
-}
-</style>

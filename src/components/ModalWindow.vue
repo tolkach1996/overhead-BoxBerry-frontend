@@ -23,7 +23,7 @@ export default {
     </div>
 </template>
 
-<style>
+<style scoped>
 .modal {
     top: 0;
     bottom: 0;

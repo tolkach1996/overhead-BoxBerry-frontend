@@ -12,6 +12,7 @@
 .row {
     width: 100%;
     display: grid;
+    border-bottom: 1px solid lightgray;
     grid-template-columns:
         44px // Иконка раскрытия заказов
         30px // Номер по порядку
@@ -33,10 +34,15 @@
         44px // Иконка редактирования заказа
         44px // Иконка удаления заказа
     ;
-    border-bottom: 1px solid lightgray;
 
     &:hover:not(&_header) {
         background-color: #0400ff10;
+    }
+
+    &_cities {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 44px minmax(200px, 1fr) 200px 200px 44px;
     }
 
     &_header {

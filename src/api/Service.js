@@ -16,3 +16,15 @@ export const downloadConsigmentExcel = async (table) => {
 export const sendConsigmentBoxBerry = async (table) => {
     return await httpClient.post('/boxberry/consigment', { data: table });
 }
+
+export const fetchAllCities = async () => {
+    return httpClient.get('/cities');
+}
+
+export const updateOneById = async (id, payload) => {
+    return httpClient.patch(`/cities/${id}`, payload);
+}
+
+export const downloadPricelist = async () => {
+    return httpClient.get('/excel/price-list', { responseType: 'blob' });
+}

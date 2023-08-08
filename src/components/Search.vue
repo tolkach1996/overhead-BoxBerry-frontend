@@ -28,4 +28,11 @@
     </div>
 </template>
 
-<style></style>
+<style lang="scss" scoped>
+    .search {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>

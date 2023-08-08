@@ -1,10 +1,14 @@
 import { ref } from 'vue';
-import { getFilterData, fetchOrdersByFilters, downloadConsigmentExcel, sendConsigmentBoxBerry } from '../api/Service';
+import { 
+    getFilterData, fetchOrdersByFilters, downloadConsigmentExcel, sendConsigmentBoxBerry, fetchAllCities, updateOneById, downloadPricelist
+} from '../api/Service';
 
 const app = () => {
     const isLoadingSearch = ref(false);
     const isLoadingDownloadExcel = ref(false);
     const isLoadingSendBoxberry = ref(false);
+    const isLoadingCities = ref(false);
+    const isLoadingDownloadCities = ref(false);
 
     const textError = ref(null);
     const isShowModal = ref(false);
@@ -16,6 +20,7 @@ const app = () => {
     const selectedFilterStatus = ref([]);
 
     const orders = ref(null);
+    const cities = ref(null);
 
     function toggleModalWindow() {
         isShowModal.value = !isShowModal.value;
@@ -95,6 +100,44 @@ const app = () => {
         }
     }
 
+    async function fetchCities() {
+        isLoadingCities.value = true;
+        try {
+            const data = await fetchAllCities();
+            cities.value = data.cities;
+        } catch(e) {
+            textError.value = e?.message || 'Ошибка сервера';
+            isShowModal.value = true;
+        } finally {
+            isLoadingCities.value = false;
+        }
+    }
+    function updatePriceById(id, { price }) {
+        try {
+            updateOneById(id, { price });
+        } catch(e) {
+            console.error(e);
+        }
+    }
+    async function downloadCities() {
+        isLoadingDownloadCities.value = true;
+        try {
+            const data = await downloadPricelist();
+            const href = window.URL.createObjectURL(new Blob([data]));
+            const link = document.createElement('a');
+            link.href = href;
+            link.setAttribute('download', 'priceList.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (e) {
+            textError.value = e?.response?.data?.message || e?.message || 'Ошибка сервера';
+            isShowModal.value = true;
+        } finally {
+            isLoadingDownloadCities.value = false
+        }
+    }
+
     return {
         filterProject,
         filterStatus,
@@ -106,11 +149,17 @@ const app = () => {
         selectedFilterProjects,
         selectedFilterStatus,
         orders,
+        cities,
+        isLoadingCities,
+        isLoadingDownloadCities,
         toggleModalWindow,
         fetchFilter,
         searchData,
         downloadExcel,
         sendBoxberry,
+        fetchCities,
+        updatePriceById,
+        downloadCities
     }
 }
 
