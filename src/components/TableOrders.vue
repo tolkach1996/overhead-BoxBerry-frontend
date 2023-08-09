@@ -1,6 +1,7 @@
 <template>
     <Table v-if="orders">
         <Row class="row_header">
+            <Column><input type="checkbox" v-model="selectedAllModel"></Column>
             <Column></Column>
             <Column>№</Column>
             <Column>Номер заказа</Column>
@@ -23,6 +24,7 @@
         </Row>
         <template v-for="(item, index) in orders" :key="item.id">
             <Row :class="{ 'row_open row_bold': item.show, [className(item)]: item.reqStatus }">
+                <Column><input type="checkbox" v-model="item.selected"></Column>
                 <Column :class="{ 'column_icon': item.orders.length > 1 }">
                     <ArrowRightIcon v-if="item.orders.length > 1" :class="{ 'arrow-bottom': item.show }"
                         @click="() => toggleRow(item)" />
@@ -104,7 +106,10 @@
     import { Table, Row, Column } from './Table';
     import { ArrowRightIcon, DeleteIcon, EditIcon, SaveIcon } from './Icons';
     import { useApp } from '../hooks/useApp';
+    import { ref, watch } from 'vue';
     const { orders } = useApp;
+
+    const selectedAllModel = ref(false);
 
     function toggleRow(row) {
         row.show = !row.show;
@@ -147,4 +152,11 @@
         if (!item.reqStatus) return null;
         return item.reqStatus == "Ок" ? 'succefully' : 'warning'
     }
+
+    watch(selectedAllModel, (value) => {
+        orders.value = orders.value.map(item => {
+            item.selected = value;
+            return item;
+        })
+    })
 </script>

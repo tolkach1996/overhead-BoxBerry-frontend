@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { 
     getFilterData, fetchOrdersByFilters, downloadConsigmentExcel, sendConsigmentBoxBerry, fetchAllCities, updateOneById, downloadPricelist
 } from '../api/Service';
@@ -21,6 +21,10 @@ const app = () => {
 
     const orders = ref(null);
     const cities = ref(null);
+
+    const selectedOrders = computed(() => {
+        return orders.value.filter(item => item.selected);
+    })
 
     function toggleModalWindow() {
         isShowModal.value = !isShowModal.value;
@@ -59,7 +63,7 @@ const app = () => {
     async function downloadExcel() {
         isLoadingDownloadExcel.value = true;
         try {
-            const data = await downloadConsigmentExcel(orders.value);
+            const data = await downloadConsigmentExcel(selectedOrders.value);
             const href = window.URL.createObjectURL(new Blob([data]));
             const link = document.createElement('a');
             link.href = href;
@@ -80,16 +84,13 @@ const app = () => {
             item.reqStatus = ''
         }
         try {
-            const res = await sendConsigmentBoxBerry(orders.value);
-            let index = 0;
-            for (let item of orders.value) {
-                if (res[index].res == 'Ок') {
-                    item.reqStatus = res[index].res
+            const { rows } = await sendConsigmentBoxBerry(selectedOrders.value);
+            for (let row of rows) {
+                const { id } = row;
+                const index = orders.value.findIndex(item => item.id === id);
+                if (index >= 0) {
+                    orders.value[index] = row;
                 }
-                else {
-                    item.reqStatus = res[index].err
-                }
-                index++;
             }
 
         } catch (e) {

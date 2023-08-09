@@ -38,7 +38,7 @@
         const isEdit = cities.value[index].isEdit;
         if (isEdit) {
             const { _id, price } = cities.value[index];
-            await updatePriceById(_id, { price });
+            updatePriceById(_id, { price });
         }
         return cities.value[index].isEdit = !isEdit;
     }

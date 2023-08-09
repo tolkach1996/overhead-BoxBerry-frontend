@@ -14,6 +14,7 @@
     display: grid;
     border-bottom: 1px solid lightgray;
     grid-template-columns:
+        44px
         44px // Иконка раскрытия заказов
         30px // Номер по порядку
         minmax(100px, 150px) // Номер заказа
@@ -35,7 +36,7 @@
         44px // Иконка удаления заказа
     ;
 
-    &:hover:not(&_header) {
+    &:hover:not(&_header):not(.warning):not(.succefully) {
         background-color: #0400ff10;
     }
 
@@ -60,5 +61,11 @@
     &_bold {
         font-weight: bold;
     }
+}
+.warning {
+    background-color: rgba(255, 0, 0, 0.15);
+}
+.succefully {
+    background-color: rgba(11, 219, 11, 0.2);
 }
 </style>
