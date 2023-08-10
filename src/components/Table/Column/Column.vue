@@ -19,6 +19,7 @@
 
 <style lang="scss" scoped>
     .column {
+        position: relative;
         display: flex;
         align-items: center;
         padding: 5px 10px;

@@ -1,13 +1,13 @@
 <template>
     <footer class="footer">
         <template v-if="isOrdersActions">
-            <Button type="button" label="Скачать Excel" icon="pi pi-search" class="prime__button" @click="downloadExcel"
-                :loading="isLoadingDownloadExcel" />
-            <Button type="button" label="Отправить в BoxBerry" icon="pi pi-search" class="prime__button" @click="sendBoxberry"
-                :loading="isLoadingSendBoxberry" />
+            <Button type="button" label="Скачать Excel" icon="pi pi-download" class="prime__button" @click="downloadExcel"
+                :loading="isLoadingDownloadExcel" :disabled="!isActiveActionsOrder" />
+            <Button type="button" label="Отправить в BoxBerry" icon="pi" class="prime__button" @click="sendBoxberry"
+                :loading="isLoadingSendBoxberry" :disabled="!isActiveActionsOrder" />
         </template>
         <template v-if="isCitiesActions">
-            <Button type="button" label="Скачать Прайс" icon="pi pi-search" class="prime__button" @click="downloadCities"
+            <Button type="button" label="Скачать Прайс" icon="pi pi-box" class="prime__button" @click="downloadCities"
                 :loading="isLoadingDownloadCities" />
         </template>
     </footer>
@@ -17,7 +17,9 @@
     import { useApp } from '../hooks/useApp';
     import { useRoute } from 'vue-router';
     import { computed } from 'vue';
-    const { orders, cities, downloadExcel, isLoadingDownloadExcel, sendBoxberry, isLoadingSendBoxberry, downloadCities, isLoadingDownloadCities } = useApp;
+    const { 
+        orders, selectedOrders, cities, downloadExcel, isLoadingDownloadExcel, sendBoxberry, isLoadingSendBoxberry, downloadCities, isLoadingDownloadCities
+    } = useApp;
     const route = useRoute();
 
     const isOrdersActions = computed(() => {
@@ -25,6 +27,9 @@
     })
     const isCitiesActions = computed(() => {
         return cities.value && route.name === 'Cities';
+    })
+    const isActiveActionsOrder = computed(() => {
+        return selectedOrders.value.length;
     })
 </script>
 

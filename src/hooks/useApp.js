@@ -22,6 +22,9 @@ const app = () => {
     const orders = ref(null);
     const cities = ref(null);
 
+    const declaredModel = ref(false);
+    const openingModel = ref(false);
+
     const selectedOrders = computed(() => {
         return orders.value.filter(item => item.selected);
     })
@@ -44,6 +47,8 @@ const app = () => {
     async function searchData() {
         isLoadingSearch.value = true;
         orders.value = null;
+        declaredModel.value = false;
+        openingModel.value = false;
         try {
             if (!selectedFilterProjects.value.length || !selectedFilterStatus.value.length) {
                 textError.value = 'Не выбран один из фильтров';
@@ -153,6 +158,9 @@ const app = () => {
         cities,
         isLoadingCities,
         isLoadingDownloadCities,
+        declaredModel,
+        openingModel,
+        selectedOrders,
         toggleModalWindow,
         fetchFilter,
         searchData,

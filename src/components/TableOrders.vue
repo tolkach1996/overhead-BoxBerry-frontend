@@ -12,6 +12,7 @@
             <Column>Комментарий</Column>
             <Column>Дата посылки</Column>
             <Column align="center">Вид доставки</Column>
+            <Column align="center">Вскрытие получаетелем</Column>
             <Column align="right">Стоимость доставки</Column>
             <Column align="right">Оплата доставки</Column>
             <Column align="right">Объявленная стоимость</Column>
@@ -46,12 +47,13 @@
                     <span v-if="!item.isEdit">{{ item.typeTransfer }}</span>
                     <input v-else v-model="item.typeTransfer" class="table__input" />
                 </Column>
+                <Column align="center">{{ item.openingStatus ? 'Да' : 'Нет' }}</Column>
                 <Column align="right">{{ item.deliverySum }}</Column>
                 <Column align="right">
                     <span v-if="!item.isEdit">{{ item.paySum }}</span>
                     <input v-else v-model="item.paySum" class="table__input" />
                 </Column>
-                <Column align="right">{{ summarizeDeclared(summarizeAmount(item.orders)) }}</Column>
+                <Column align="right">{{ summarizeDeclared(summarizeAmount(item.orders), item.declaredStatus) }}</Column>
                 <Column align="center">
                     <span v-if="!item.isEdit">{{ item.departurePointCode }}</span>
                     <input v-else v-model="item.departurePointCode" class="table__input" />
@@ -70,7 +72,8 @@
                     <SaveIcon v-else @click="() => toggleEditRow(index)" />
                 </Column>
                 <Column align="center" class="column_icon">
-                    <DeleteIcon @click="() => removeItem(index)" />
+                    <!-- <DeleteIcon @click="() => removeItem(index)" /> -->
+                    <span class="pi pi-ellipsis-h icon" @click.stop="(e) => openMenu(e, index)"></span>
                 </Column>
             </Row>
             <template v-if="item.orders.length > 1 && item.show">
@@ -100,16 +103,53 @@
             </template>
         </template>
     </Table>
+
+    <div class="table-menu" v-if="menuParams.isOpen" ref="menuRef" :style="styleMenu">
+        <div class="table-menu__item" @click="toggleDeclaredStatus">
+            <span class="table-menu__icon pi" :class="{ 'pi-times': !menuParams.declaredStatus, 'pi-check': menuParams.declaredStatus }"></span>
+            <span>Объявленная стоимость</span>
+        </div>
+        <div class="table-menu__item" @click="toggleOpeningStatus">
+            <span class="table-menu__icon pi" :class="{ 'pi-times': !menuParams.openingStatus, 'pi-check': menuParams.openingStatus }"></span>
+            <span>Вскрытие при получении</span>
+        </div>
+        <div class="table-menu__split"></div>
+        <div class="table-menu__item table-menu__item_trash" @click="removeItemFromMenu">
+            <span class="table-menu__icon pi pi-trash"></span>
+            <span>Удалить</span>
+        </div>
+    </div>
 </template>
 
 <script setup>
+    import clickOutside from '../directives/clickOutside';
     import { Table, Row, Column } from './Table';
     import { ArrowRightIcon, DeleteIcon, EditIcon, SaveIcon } from './Icons';
     import { useApp } from '../hooks/useApp';
-    import { ref, watch } from 'vue';
+    import { ref, watch, reactive, computed } from 'vue';
     const { orders } = useApp;
 
     const selectedAllModel = ref(false);
+    const menuRef = ref(null);
+
+    const indexMenuRow = ref(-1);
+
+    const menuParams = reactive({
+        declaredStatus: computed(() => indexMenuRow.value > -1 && orders.value[indexMenuRow.value]?.declaredStatus),
+        openingStatus: computed(() => indexMenuRow.value > -1 && orders.value[indexMenuRow.value]?.openingStatus),
+        coordinates: {
+            x: 0,
+            y: 0
+        },
+        isOpen: false,
+    })
+
+    const styleMenu = computed(() => {
+        return {
+            'top': `${menuParams.coordinates.y}px`,
+            'left': `${menuParams.coordinates.x - menuRef?.value?.offsetWidth + 24}px`
+        }
+    })
 
     function toggleRow(row) {
         row.show = !row.show;
@@ -145,12 +185,38 @@
         }
         return array[0].sumOrder;
     }
-    function summarizeDeclared(amount) {
+    function summarizeDeclared(amount, status) {
+        if (status) return amount;
         return amount > 10000 ? amount : 5;
     }
     function className(item) {
         if (!item.reqStatus) return null;
         return item.reqStatus == "Ок" ? 'succefully' : 'warning'
+    }
+
+    function openMenu(e, index) {
+
+        const coords = e.target.getBoundingClientRect();
+
+        menuParams.coordinates.x = coords.x;
+        menuParams.coordinates.y = coords.y;
+
+        menuParams.isOpen = true;
+
+        indexMenuRow.value = index;
+    }
+    function closeMenu() {
+        menuParams.isOpen = false;
+    }
+    function toggleDeclaredStatus() {
+        orders.value[indexMenuRow.value].declaredStatus = !orders.value[indexMenuRow.value].declaredStatus;
+    }
+    function toggleOpeningStatus() {
+        orders.value[indexMenuRow.value].openingStatus = !orders.value[indexMenuRow.value].openingStatus;
+    }
+    function removeItemFromMenu() {
+        removeItem(indexMenuRow);
+        closeMenu();
     }
 
     watch(selectedAllModel, (value) => {
@@ -159,4 +225,56 @@
             return item;
         })
     })
+
+    clickOutside(menuRef, closeMenu);
+
 </script>
+
+<style lang="scss" scoped>
+    .icon {
+        min-width: 24px;
+        height: 24px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .table-menu {
+        position: absolute;
+        width: auto;
+        background-color: white;
+        box-shadow: 0px 0px 3px 0px gray;
+        padding: 7px 0px;
+        z-index: 999;
+        user-select: none;
+
+        &__item {
+            width: 100%;
+            color: rgb(41, 41, 41);
+            padding: 8px 10px;
+            white-space: nowrap;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+
+            opacity: 0.75;
+
+            &_trash {
+                color: rgba(255, 0, 0);
+            }
+
+            &:hover {
+                opacity: 1;
+                background-color: rgb(235, 235, 235);
+            }
+        }
+        &__split {
+            width: 100%;
+            margin: 10px 0px;
+            border-bottom: 1px solid lightgray;
+        }
+    }
+</style>

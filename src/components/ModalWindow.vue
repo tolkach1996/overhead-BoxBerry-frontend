@@ -18,7 +18,7 @@ export default {
     <div class="modal" v-if="show">
         <div class="content">
             <slot></slot>
-            <Button type="button" label="Ок" icon="pi pi-search" class="prime__button" @click="hideDialog" />
+            <Button type="button" label="Закрыть" class="prime__button" @click="hideDialog" />
         </div>
     </div>
 </template>

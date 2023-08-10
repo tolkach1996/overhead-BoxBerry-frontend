@@ -11,6 +11,7 @@ import Button from 'primevue/button';
 
 import 'primevue/resources/themes/lara-light-indigo/theme.css';
 import 'primevue/resources/primevue.min.css';
+import 'primeicons/primeicons.css';
 
 
 const app = createApp(App);
