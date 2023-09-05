@@ -14,8 +14,9 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        padding: 0px 40px;
+        gap: 24px;
+        padding: 10px 40px;
         overflow: auto;
+        background: #F1F5F9;
     }
 </style>

@@ -22,7 +22,7 @@
         align-items: center;
         padding: 0px 40px;
         background-color: white;
-        box-shadow: 0px 2px 5px 1px rgb(3, 3, 3, 0.1);
+        border-bottom: 2px solid #D0DAE4;
         min-height: 70px;
         height: 70px;
 

@@ -18,6 +18,11 @@ export const router = createRouter({
                     path: 'cities',
                     name: 'Cities',
                     component: () => import('../pages/CitiesPage.vue')
+                },
+                {
+                    path: 'issue-orders',
+                    name: 'IssueORders',
+                    component: () => import('../pages/IssueOrders/IssueOrdersPage.vue')
                 }
             ]
         }
