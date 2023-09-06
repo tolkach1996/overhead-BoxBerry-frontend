@@ -1,9 +1,10 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import App from './App.vue';
 import PrimeVue from 'primevue/config';
 import { router } from './routes';
 
-import './style.scss';
+import '@/assets/styles/index.scss';
 
 
 import MultiSelect from 'primevue/multiselect';
@@ -15,7 +16,9 @@ import 'primeicons/primeicons.css';
 
 
 const app = createApp(App);
+const pinia = createPinia();
 
+app.use(pinia);
 app.use(PrimeVue);
 app.use(router);
 

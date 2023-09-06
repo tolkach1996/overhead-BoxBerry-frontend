@@ -7,6 +7,9 @@
             <RouterLink :to="{ name: 'Cities' }" class="link">
                 <div class="header-menu__item">Стоимость доставки</div>
             </RouterLink>
+            <RouterLink :to="{ name: 'IssueOrders' }" class="link">
+                <div class="header-menu__item">Сканирование товаров</div>
+            </RouterLink>
         </nav>
     </header>
 </template>

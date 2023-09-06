@@ -21,7 +21,7 @@ export const router = createRouter({
                 },
                 {
                     path: 'issue-orders',
-                    name: 'IssueORders',
+                    name: 'IssueOrders',
                     component: () => import('../pages/IssueOrders/IssueOrdersPage.vue')
                 }
             ]

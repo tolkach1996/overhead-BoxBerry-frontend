@@ -15,6 +15,20 @@ httpClient.interceptors.response.use(
         } else {
             return Promise.reject("error");
         }
+    },
+    (error) => {
+        const res = error.response;
+        
+        /* if (res.status === 401) {
+            const store = useAuthStore();
+            store.logout();
+        } */
+
+        if (res?.data) {
+            throw res.data;
+        }
+        
+        throw error;
     }
 );
 

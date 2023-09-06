@@ -23,6 +23,7 @@
         justify-content: flex-start;
         align-items: flex-start;
         width: min-content;
+        font-size: 14px;
 
         &__input {
             width: 100%;

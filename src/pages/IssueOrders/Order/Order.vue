@@ -1,5 +1,5 @@
 <template>
-    <h1>Вывача заказа</h1>
+    <h1>Выдача заказа</h1>
     <div class="order">
         <div class="order__column order__column_size_fixed">
             <div class="card">
@@ -7,12 +7,34 @@
                 <div class="user">
                     <div class="user__avatar"></div>
                     <div class="user-info">
-                        <div class="user-info__name">Смирнов Михаил Анатольевич</div>
-                        <div class="user-info__phone">+7 903 734-64-65</div>
+                        <div class="user-info__name">{{ order.agent?.name }}</div>
+                        <div class="user-info__phone">{{ formatPhone(order.agent?.phone) }}</div>
                     </div>
                 </div>
             </div>
-            <div class="card"></div>
+            <div class="card">
+                <div class="card-order__header">
+                    <div class="card-order__row card-order__row_vertical">
+                        <div class="card-order__title">Заказ №</div>
+                        <div class="card-order__num-status">
+                            <span class="card-order__number">{{ order.name }}</span>
+                            <div class="card-order__status">{{ order.state?.name }}</div>
+                        </div>
+                    </div>
+                    <div class="card-order__row">
+                        <div class="card-order__sub-title">Дата заказа: {{ formatDate(order?.created) }}</div>
+                    </div>
+                </div>
+                <div class="card-order__comment">
+                    <div class="card-order__title">Комментарий</div>
+                    <div class="card-order__text">{{ order.description }}
+                    </div>
+                </div>
+                <div class="card-order__action">
+                    <button class="card__button card__button_filed" @click="updateStatus" :disabled="loading">{{ loading ? 'Загрузка' : 'Выдать заказ' }}</button>
+                    <button class="card__button card__button_outline" @click="newScaning" :disabled="loading">{{ loading ? 'Загрузка' : 'Новое сканирование' }}</button>
+                </div>
+            </div>
         </div>
         <div class="order__column">
             <div class="order-table">
@@ -22,35 +44,59 @@
                     <div class="order-table__col order-table__col_align_center">Количество</div>
                     <div class="order-table__col order-table__col_align_right">Сумма</div>
                 </div>
-                <div class="order-table__row">
-                    <div class="order-table__col">Наименование товара</div>
-                    <div class="order-table__col order-table__col_align_right">Стоимость</div>
-                    <div class="order-table__col order-table__col_align_center">Количество</div>
-                    <div class="order-table__col order-table__col_align_right">Сумма</div>
-                </div>
-                <div class="order-table__row">
-                    <div class="order-table__col">Наименование товара</div>
-                    <div class="order-table__col order-table__col_align_right">Стоимость</div>
-                    <div class="order-table__col order-table__col_align_center">Количество</div>
-                    <div class="order-table__col order-table__col_align_right">Сумма</div>
-                </div>
-                <div class="order-table__row">
-                    <div class="order-table__col">Наименование товара</div>
-                    <div class="order-table__col order-table__col_align_right">Стоимость</div>
-                    <div class="order-table__col order-table__col_align_center">Количество</div>
-                    <div class="order-table__col order-table__col_align_right">Сумма</div>
+                <div class="order-table__row" v-for="item in order.positions?.rows" :key="item.id">
+                    <div class="order-table__col">{{ item.assortment?.name }}</div>
+                    <div class="order-table__col order-table__col_align_right">{{ formatPrice((item?.price || 0) / 100) }}</div>
+                    <div class="order-table__col order-table__col_align_center">{{ item?.quantity }}</div>
+                    <div class="order-table__col order-table__col_align_right">{{ formatPrice(sumProduct(item)) }}</div>
                 </div>
             </div>
             <div class="order__summary">
                 <span>ИТОГО</span>
-                <span>200 000</span>
+                <span>{{ formatPrice(sumProducts) }}</span>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
+    import { formatPhone, formatDate, formatPrice } from '@/helpers/formatter';
+    import { computed } from 'vue';
+    import { useOrderStore } from '@/store/order.store';
+    import { useNoticeStore } from '@/store/notice.store';
+    import { storeToRefs } from 'pinia';
 
+    const orderStore = useOrderStore();
+    const { loading, textError } = storeToRefs(orderStore);
+
+    const noticeStore = useNoticeStore();
+
+
+    const props = defineProps({
+        order: Object
+    })
+
+    const sumProducts = computed(() => {
+        return props.order.positions.rows.reduce((pre, cur) => {
+            return pre += sumProduct(cur);
+        }, 0)
+    })
+
+    function sumProduct(item) {
+        return (item?.price || 0) * item.quantity / 100;
+    }
+    async function updateStatus() {
+        await orderStore.updateOrder(props.order.id);
+        if (!textError.value) {
+            newScaning();
+            noticeStore.setText('Успешно!');
+        } else {
+            noticeStore.setText(`Ошибка! ${textError.value}`);
+        }
+    }
+    function newScaning() {
+        orderStore.newScaning();
+    }
 </script>
 
 <style lang="scss" scoped>
@@ -134,6 +180,91 @@
             font-size: 18px;
             font-weight: 700;
             line-height: 22px; /* 122.222% */
+        }
+
+        &-order {
+            &__header {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            &__num-status {
+                display: flex;
+                gap: 13px;
+                align-items: center;
+            }
+            &__comment {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            &__action {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            &__row {
+                display: flex;
+                align-items: center;
+                gap: 13px;
+
+                &_vertical {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    gap: 0px;
+                }
+            }
+            &__status {
+                padding: 6px 14px;
+                border-radius: 64px;
+                border: 1px solid gray;
+                font-size: 12px;
+                font-weight: 500;
+                line-height: 14px;
+                white-space: nowrap;
+            }
+            &__title {
+                font-size: 18px;
+                font-weight: 700;
+            }
+            &__number {
+                font-size: 32px;
+            }
+            &__text {
+                font-size: 14px;
+                line-height: 22px;
+            }
+        }
+
+        &__button {
+            width: 100%;
+            height: 54px;
+            border: 2px solid #126CF3;
+            border-radius: 5px;
+            font-size: 24px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 32px;
+            cursor: pointer;
+
+            &:hover:not(:disabled) {
+                box-shadow: 2px 2px 7px 2px rgba(0, 0, 0, 0.2);
+            }
+
+            &:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+            
+            &_outline {
+                background-color: white;
+                color: #126CF3;
+            }
+            &_filed {
+                background-color: #126CF3;
+                color: white;
+            }
         }
     }
     .user {

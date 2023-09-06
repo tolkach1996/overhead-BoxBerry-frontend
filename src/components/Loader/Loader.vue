@@ -63,7 +63,7 @@
 
             border-radius: 50%;
             border: var(--thickness) solid transparent;
-            background:conic-gradient(from 180deg at 50% 50%, blue 0deg, rgba(217, 217, 217, 0) 360deg) border-box;
+            background:conic-gradient(from 180deg at 50% 50%, #126CF3 0deg, rgba(217, 217, 217, 0) 360deg) border-box;
             -webkit-mask:
                 linear-gradient(#fff 0 0) padding-box, 
                 linear-gradient(#fff 0 0);
@@ -73,7 +73,7 @@
             &::after {
                 content: "";
                 position: absolute;
-                background-color: blue;
+                background-color: #126CF3;
                 width: var(--thickness);
                 height: var(--thickness);
                 border-radius: 50%;
