@@ -25,31 +25,9 @@
     import Notice from '@/components/Notice/Notice.vue';
     import { useOrderStore } from '@/store/order.store';
     import { storeToRefs } from 'pinia';
-    import { ref, onMounted, onUnmounted } from 'vue';
 
     const orderStore = useOrderStore();
     const { order, loading, notFound } = storeToRefs(orderStore);
-
-    const numberOrder = ref('');
-
-    function onInput(e) {
-        const key = e.key;
-        if (!key) return;
-
-        if (key === 'Enter') {
-            orderStore.getOrderById(numberOrder.value)
-            numberOrder.value = '';
-        } else {
-            numberOrder.value += String(key);
-        }
-    }
-
-    onMounted(() => {
-        window.addEventListener('keypress', onInput);
-    })
-    onUnmounted(() => {
-        window.removeEventListener('keypress', onInput);
-    })
 
 </script>
 

@@ -15,7 +15,48 @@
 </template>
 
 <script setup>
-    import { RouterLink } from 'vue-router';
+    import { onMounted, onUnmounted, ref, watch } from 'vue';
+    import { useRoute } from 'vue-router';
+    import { useOrderStore } from '@/store/order.store';
+
+    const route = useRoute();
+    const orderStore = useOrderStore();
+
+    const numberOrder = ref('');
+
+    function onInput(e) {
+        const key = e.key;
+
+        console.log(key);
+
+        if (!key || (key.length > 1 && key !== 'Enter')) return;
+
+        if (key === 'Enter') {
+            orderStore.getOrderById(numberOrder.value);
+            numberOrder.value = '';
+        } else {
+            numberOrder.value += String(key);
+        }
+    }
+
+    watch(route, value => {
+        if (value.name === 'IssueOrders') {
+            window.addEventListener('keyup', onInput);
+        } else {
+            console.log('Отписались от события почему то ...');
+            window.removeEventListener('keyup', onInput);
+            orderStore.newScaning();
+        }
+    })
+
+    onMounted(() => {
+        if (route.name === 'IssueOrders') {
+            window.addEventListener('keyup', onInput);
+        }
+    })
+    onUnmounted(() => {
+        window.addEventListener('keyup', onInput);
+    })
 </script>
 
 <style lang="scss" scoped>
