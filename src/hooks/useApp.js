@@ -54,7 +54,7 @@ const app = () => {
                 textError.value = 'Не выбран один из фильтров';
                 isShowModal.value = true;
             } else {
-                const data = await fetchOrdersByFilters(selectedFilterProjects.value, selectedFilterStatus.value);
+                const { orders: data } = await fetchOrdersByFilters(selectedFilterProjects.value, selectedFilterStatus.value);
                 orders.value = data;
             }
         } catch (e) {

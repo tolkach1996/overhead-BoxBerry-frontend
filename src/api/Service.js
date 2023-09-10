@@ -2,7 +2,7 @@ import httpClient from "./client";
 
 
 export const fetchOrdersByFilters = async (selectedProjects, selectedMetadata) => {
-    return await httpClient.post('/ms/orders', { selectedMetadata, selectedProjects });
+    return await httpClient.post('/orders', { selectedMetadata, selectedProjects });
 }
 
 export const getFilterData = async () => {

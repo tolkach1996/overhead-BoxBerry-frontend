@@ -1,83 +1,90 @@
 <template>
-    <h1>Выдача заказа</h1>
-    <div class="order">
-        <div class="order__column order__column_size_fixed">
-            <div class="card">
-                <span class="card__name">Клиент</span>
-                <div class="user">
-                    <div class="user__avatar"></div>
-                    <div class="user-info">
-                        <div class="user-info__name">{{ order.agent?.name }}</div>
-                        <div class="user-info__phone">{{ formatPhone(order.agent?.phone) }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-order__header">
-                    <div class="card-order__row card-order__row_vertical">
-                        <div class="card-order__title">Заказ №</div>
-                        <div class="card-order__num-status">
-                            <span class="card-order__number">{{ order.name }}</span>
-                            <div class="card-order__status">{{ order.state?.name }}</div>
+    <template v-if="order">
+        <h1>Информация о заказе</h1>
+        <div class="order">
+            <div class="order__column order__column_size_fixed">
+                <div class="card">
+                    <span class="card__name">Клиент</span>
+                    <div class="user">
+                        <div class="user__avatar"></div>
+                        <div class="user-info">
+                            <div class="user-info__name">{{ order.agent?.name }}</div>
+                            <div class="user-info__phone">{{ formatPhone(order.agent?.phone) }}</div>
                         </div>
                     </div>
-                    <div class="card-order__row">
-                        <div class="card-order__sub-title">Дата заказа: {{ formatDate(order?.created) }}</div>
+                </div>
+                <div class="card">
+                    <div class="card-order__header">
+                        <div class="card-order__row card-order__row_vertical">
+                            <div class="card-order__title">Заказ №</div>
+                            <div class="card-order__num-status">
+                                <span class="card-order__number">{{ order.name }}</span>
+                                <div class="card-order__status">{{ order.state?.name }}</div>
+                            </div>
+                        </div>
+                        <div class="card-order__row">
+                            <div class="card-order__sub-title">Дата заказа: <b>{{ formatDate(order?.created) }}</b></div>
+                        </div>
+                        <div class="card-order__row">
+                            <div class="card-order__sub-title">Склад: <b>{{ order?.store?.name || 'нет' }}</b></div>
+                        </div>
+                        <div class="card-order__row">
+                            <div class="card-order__sub-title">Проект: <b>{{ order?.project?.name || 'нет' }}</b></div>
+                        </div>
+                    </div>
+                    <div class="card-order__comment">
+                        <div class="card-order__title">Комментарий</div>
+                        <div class="card-order__text">{{ order.description }}
+                        </div>
                     </div>
                 </div>
-                <div class="card-order__comment">
-                    <div class="card-order__title">Комментарий</div>
-                    <div class="card-order__text">{{ order.description }}
+            </div>
+            <div class="order__column">
+                <div class="order-table">
+                    <div class="order-table__row order-table__row_header">
+                        <div class="order-table__col">Наименование товара</div>
+                        <div class="order-table__col order-table__col_align_right">Стоимость</div>
+                        <div class="order-table__col order-table__col_align_center">Количество</div>
+                        <div class="order-table__col order-table__col_align_right">Сумма</div>
+                    </div>
+                    <div class="order-table__row" v-for="item in order.positions?.rows" :key="item.id">
+                        <div class="order-table__col">{{ item.assortment?.name }}</div>
+                        <div class="order-table__col order-table__col_align_right">{{ formatPrice((item?.price || 0) / 100) }}</div>
+                        <div class="order-table__col order-table__col_align_center">{{ item?.quantity }}</div>
+                        <div class="order-table__col order-table__col_align_right">{{ formatPrice(sumProduct(item)) }}</div>
                     </div>
                 </div>
-                <div class="card-order__action">
-                    <button class="card__button card__button_filed" @click="updateStatus" :disabled="loading">{{ loading ? 'Загрузка' : 'Выдать заказ' }}</button>
-                    <button class="card__button card__button_outline" @click="newScaning" :disabled="loading">{{ loading ? 'Загрузка' : 'Новое сканирование' }}</button>
+                <div class="order__summary">
+                    <span>ИТОГО</span>
+                    <span>{{ formatPrice(sumProducts) }}</span>
                 </div>
             </div>
         </div>
-        <div class="order__column">
-            <div class="order-table">
-                <div class="order-table__row order-table__row_header">
-                    <div class="order-table__col">Наименование товара</div>
-                    <div class="order-table__col order-table__col_align_right">Стоимость</div>
-                    <div class="order-table__col order-table__col_align_center">Количество</div>
-                    <div class="order-table__col order-table__col_align_right">Сумма</div>
-                </div>
-                <div class="order-table__row" v-for="item in order.positions?.rows" :key="item.id">
-                    <div class="order-table__col">{{ item.assortment?.name }}</div>
-                    <div class="order-table__col order-table__col_align_right">{{ formatPrice((item?.price || 0) / 100) }}</div>
-                    <div class="order-table__col order-table__col_align_center">{{ item?.quantity }}</div>
-                    <div class="order-table__col order-table__col_align_right">{{ formatPrice(sumProduct(item)) }}</div>
-                </div>
-            </div>
-            <div class="order__summary">
-                <span>ИТОГО</span>
-                <span>{{ formatPrice(sumProducts) }}</span>
-            </div>
-        </div>
-    </div>
+    </template>
+    <template v-else-if="!order && !loading">
+        <OrderNotFound />
+    </template>
+    <template v-if="loading">
+        <Loader />
+    </template>
 </template>
 
 <script setup>
+    import OrderNotFound from '@/components/Order/OrderNotFound.vue';
     import { formatPhone, formatDate, formatPrice } from '@/helpers/formatter';
-    import { computed } from 'vue';
+    import Loader from '@/components/Loader/Loader.vue';
+    import { computed, onMounted } from 'vue';
     import { useOrderStore } from '@/store/order.store';
-    import { useNoticeStore } from '@/store/notice.store';
     import { storeToRefs } from 'pinia';
+    import { useRoute } from 'vue-router';
+
+    const route = useRoute();
 
     const orderStore = useOrderStore();
-    const { loading, textError } = storeToRefs(orderStore);
-
-    const noticeStore = useNoticeStore();
-
-
-    const props = defineProps({
-        order: Object
-    })
+    const { loading, order } = storeToRefs(orderStore);
 
     const sumProducts = computed(() => {
-        return props.order.positions.rows.reduce((pre, cur) => {
+        return order.value.positions.rows.reduce((pre, cur) => {
             return pre += sumProduct(cur);
         }, 0)
     })
@@ -85,18 +92,10 @@
     function sumProduct(item) {
         return (item?.price || 0) * item.quantity / 100;
     }
-    async function updateStatus() {
-        await orderStore.updateOrder(props.order.id);
-        if (!textError.value) {
-            newScaning();
-            noticeStore.setText('Успешно!');
-        } else {
-            noticeStore.setText(`Ошибка! ${textError.value}`);
-        }
-    }
-    function newScaning() {
-        orderStore.newScaning();
-    }
+
+    onMounted(() => {
+        orderStore.getOrderByDocumentId(route.params.id);
+    })
 </script>
 
 <style lang="scss" scoped>
@@ -234,36 +233,6 @@
             &__text {
                 font-size: 14px;
                 line-height: 22px;
-            }
-        }
-
-        &__button {
-            width: 100%;
-            height: 54px;
-            border: 2px solid #126CF3;
-            border-radius: 5px;
-            font-size: 24px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 32px;
-            cursor: pointer;
-
-            &:hover:not(:disabled) {
-                box-shadow: 2px 2px 7px 2px rgba(0, 0, 0, 0.2);
-            }
-
-            &:disabled {
-                opacity: 0.3;
-                cursor: not-allowed;
-            }
-            
-            &_outline {
-                background-color: white;
-                color: #126CF3;
-            }
-            &_filed {
-                background-color: #126CF3;
-                color: white;
             }
         }
     }

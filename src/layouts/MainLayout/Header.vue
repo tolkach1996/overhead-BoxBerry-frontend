@@ -1,30 +1,47 @@
 <template>
     <header class="header">
         <nav class="header-menu">
-            <RouterLink :to="{ name: 'Main' }" class="link">
+            <RouterLink :to="{ name: ROUTES_NAME.MAIN }" class="link">
                 <div class="header-menu__item">Выгрузка в BoxBerry</div>
             </RouterLink>
-            <RouterLink :to="{ name: 'Cities' }" class="link">
+            <RouterLink 
+                :to="{ name: ROUTES_NAME.CITIES }" 
+                class="link"
+            >
                 <div class="header-menu__item">Стоимость доставки</div>
             </RouterLink>
-            <RouterLink :to="{ name: 'IssueOrders' }" class="link">
-                <div class="header-menu__item">Сканирование товаров</div>
+            <RouterLink 
+                :to="{ name: ROUTES_NAME.ORDERS_MOVE_ACCEPT }" 
+                class="link"
+                :class="{ 'router-link-exact-active': isActive }"
+            >
+                <div class="header-menu__item">Заказы</div>
             </RouterLink>
         </nav>
     </header>
 </template>
 
 <script setup>
-    import { onMounted, onUnmounted, ref, watch } from 'vue';
+    import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
     import { useRoute } from 'vue-router';
     import { useOrderStore } from '@/store/order.store';
+    import { useNoticeStore } from '@/store/notice.store';
+    import { ROUTES_NAME } from '../../constants/routesName';
+    import { storeToRefs } from 'pinia';
+
+    const pagesScaner = [ROUTES_NAME.ORDERS_MOVE_ACCEPT, ROUTES_NAME.ORDERS_MOVE_EXTRADITION];
+    const pageOrders = [...pagesScaner];
 
     const route = useRoute();
     const orderStore = useOrderStore();
+    const { textError } = storeToRefs(orderStore);
+    const noticeStrore = useNoticeStore();
 
     const numberOrder = ref('');
 
-    function onInput(e) {
+    const isActive = computed(() => pageOrders.includes(route.name));
+
+    async function onInput(e) {
         const key = e.key;
 
         console.log(key);
@@ -32,30 +49,39 @@
         if (!key || (key.length > 1 && key !== 'Enter')) return;
 
         if (key === 'Enter') {
-            orderStore.getOrderById(numberOrder.value);
+            await orderStore.updateOrder(numberOrder.value);
             numberOrder.value = '';
+            console.log(textError.value);
+            if (textError.value) {
+                noticeStrore.setText(`ОШИБКА! ${textError.value}`);
+            } else {
+                noticeStrore.setText('УСПЕШНО! Статус заказа изменен')
+                await orderStore.getOrders();
+            }
         } else {
             numberOrder.value += String(key);
         }
     }
 
     watch(route, value => {
-        if (value.name === 'IssueOrders') {
+
+        if (pagesScaner.includes(value.name)) {
             window.addEventListener('keyup', onInput);
         } else {
-            console.log('Отписались от события почему то ...');
             window.removeEventListener('keyup', onInput);
             orderStore.newScaning();
         }
     })
 
     onMounted(() => {
-        if (route.name === 'IssueOrders') {
+        if (pagesScaner.includes(route.name)) {
             window.addEventListener('keyup', onInput);
         }
     })
     onUnmounted(() => {
-        window.addEventListener('keyup', onInput);
+        if (pagesScaner.includes(route.name)) {
+            window.addEventListener('keyup', onInput);
+        }
     })
 </script>
 

@@ -14,19 +14,21 @@
 </template>
 
 <script setup>
-    import { useApp } from '../hooks/useApp';
+    import { useApp } from '@/hooks/useApp';
     import { useRoute } from 'vue-router';
     import { computed } from 'vue';
+    import { ROUTES_NAME } from '@/constants/routesName';
+
     const { 
         orders, selectedOrders, cities, downloadExcel, isLoadingDownloadExcel, sendBoxberry, isLoadingSendBoxberry, downloadCities, isLoadingDownloadCities
     } = useApp;
     const route = useRoute();
 
     const isOrdersActions = computed(() => {
-        return orders.value && route.name === 'Main';
+        return orders.value && route.name === ROUTES_NAME.MAIN;
     })
     const isCitiesActions = computed(() => {
-        return cities.value && route.name === 'Cities';
+        return cities.value && route.name === ROUTES_NAME.CITIES;
     })
     const isActiveActionsOrder = computed(() => {
         return selectedOrders.value.length;

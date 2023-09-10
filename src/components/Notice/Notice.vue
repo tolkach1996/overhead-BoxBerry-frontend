@@ -20,8 +20,9 @@
         transform: translateX(-50%);
         border-radius: 4px;
         padding: 14px 16px;
-        background-color: #9e9e9e;
-        color: black;
+        background-color: #343434;
+        color: white;
+        font-weight: bold;
         z-index: 10;
     }
 </style>
