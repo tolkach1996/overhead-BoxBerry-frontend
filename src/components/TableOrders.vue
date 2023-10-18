@@ -2,26 +2,13 @@
     <Table v-if="orders">
         <Row class="row_header">
             <Column><input type="checkbox" v-model="selectedAllModel"></Column>
-            <Column></Column>
-            <Column>№</Column>
-            <Column>Номер заказа</Column>
-            <Column>Проект</Column>
-            <Column>ФИО</Column>
-            <Column>Телефон</Column>
-            <Column align="right">Сумма заказа</Column>
-            <Column>Комментарий</Column>
-            <Column>Дата посылки</Column>
-            <Column align="center">Вид доставки</Column>
-            <Column align="center">Вскрытие получаетелем</Column>
-            <Column align="right">Стоимость доставки</Column>
-            <Column align="right">Оплата доставки</Column>
-            <Column align="right">Объявленная стоимость</Column>
-            <Column align="center">Код пункта поступления</Column>
-            <Column align="center">Код ПВЗ</Column>
-            <Column>Вес 1 места (грамм)</Column>
-            <Column>Текст Ошибки</Column>
-            <Column></Column>
-            <Column></Column>
+            <Column 
+                v-for="item in HEADER_ORDERS" :key="item.id"
+                :align="item?.align"
+                @click="() => sortTable(item.key)"
+            >
+                <span>{{ item.text }}</span>
+            </Column>
         </Row>
         <template v-for="(item, index) in orders" :key="item.id">
             <Row :class="{ 'row_open row_bold': item.show, [className(item)]: item.reqStatus }">
@@ -79,6 +66,7 @@
             <template v-if="item.orders.length > 1 && item.show">
                 <Row v-for="(row, subIndex) in item.orders" :key="index + row.id" :class="{ 'row_open': item.show }">
                     <Column></Column>
+                    <Column></Column>
                     <Column>{{ subIndex + 1 }}</Column>
                     <Column>{{ row.numberOrder }}</Column>
                     <Column>{{ row.project }}</Column>
@@ -103,7 +91,6 @@
             </template>
         </template>
     </Table>
-
     <div class="table-menu" v-if="menuParams.isOpen" ref="menuRef" :style="styleMenu">
         <div class="table-menu__item" @click="toggleDeclaredStatus">
             <span class="table-menu__icon pi" :class="{ 'pi-times': !menuParams.declaredStatus, 'pi-check': menuParams.declaredStatus }"></span>
@@ -124,10 +111,13 @@
 <script setup>
     import clickOutside from '../directives/clickOutside';
     import { Table, Row, Column } from './Table';
-    import { ArrowRightIcon, DeleteIcon, EditIcon, SaveIcon } from './Icons';
+    import { ArrowRightIcon, DeleteIcon, EditIcon, SaveIcon, FilterIcon } from './Icons';
     import { useApp } from '../hooks/useApp';
+    import { HEADER_ORDERS } from '../constants/hardData';
     import { ref, watch, reactive, computed } from 'vue';
     const { orders } = useApp;
+
+    const isDescSorting = ref(false);
 
     const selectedAllModel = ref(false);
     const menuRef = ref(null);
@@ -217,6 +207,21 @@
     function removeItemFromMenu() {
         removeItem(indexMenuRow);
         closeMenu();
+    }
+
+    function sortTable(key) {
+        if (!key) return;
+        
+        orders.value.sort((a, b) => {
+            const aa = a[key];
+            const bb = b[key];
+
+            if (aa > bb) return isDescSorting.value ? -1 : 1;
+            else if (aa < bb) return isDescSorting.value ? 1 : -1;
+            return 0;
+        })
+
+        isDescSorting.value = !isDescSorting.value;
     }
 
     watch(selectedAllModel, (value) => {

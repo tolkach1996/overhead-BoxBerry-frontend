@@ -46,6 +46,9 @@
                 justify-content: flex-end;
                 text-align: right;
             }
+            &_space-between {
+                justify-content: space-between;
+            }
         }
     }
 </style>
