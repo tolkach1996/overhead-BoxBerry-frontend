@@ -9,30 +9,32 @@
 </template>
 
 <script setup>
-    import DataFilter from '@/components/OrdersMove/Filters/DataFilter.vue';
-    import DataTable from '@/components/OrdersMove/DataTable/DataTable.vue';
-    import Loader from '@/components/Loader/Loader.vue';
-    import { storeToRefs } from 'pinia'
-    import { useOrderStore } from '@/store/order.store';
-    import { onMounted } from 'vue';
+import DataFilter from "@/components/OrdersMove/Filters/DataFilter.vue";
+import DataTable from "@/components/OrdersMove/DataTable/DataTable.vue";
+import Loader from "@/components/Loader/Loader.vue";
+import { storeToRefs } from "pinia";
+import { useOrderStore } from "@/store/order.store";
+import { onMounted } from "vue";
 
-    const orderStore = useOrderStore();
-    const { orders, loading } = storeToRefs(orderStore);
+const orderStore = useOrderStore();
+const { orders, loading } = storeToRefs(orderStore);
 
-    function changeDateFilter(dates) {
-        orderStore.setFilter('dates', dates);
-    }
+function changeDateFilter(dates) {
+    orderStore.setFilter("dates", dates);
+}
 
-    onMounted(() => {
-        orderStore.setFilter('type', 'accept');
-        orderStore.setFilter('dates', [new Date(), null]);
-    })
+onMounted(() => {
+    orderStore.setFilter("type", "accept");
+    orderStore.setFilter("dates", [new Date(), null]);
+    const pickup = orderStore.getFilter("pickupPoint");
+    orderStore.setFilter("pickupPoint", pickup || "ПВЗ Дубровка");
+});
 </script>
 
 <style lang="scss" scoped>
-    .page {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 </style>

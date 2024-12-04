@@ -3,14 +3,15 @@ import OrderService from "@/api/OrderService";
 import { defineStore } from "pinia";
 import { reactive, ref, watch } from "vue";
 
-export const useOrderStore = defineStore('orderStore', () => {
+export const useOrderStore = defineStore("orderStore", () => {
     const order = ref(null);
     const orders = ref([]);
 
     const filter = reactive({
         dates: [new Date(), null],
-        type: null
-    })
+        type: null,
+        pickupPoint: null,
+    });
 
     const loading = ref(false);
     const notFound = ref(false);
@@ -25,7 +26,7 @@ export const useOrderStore = defineStore('orderStore', () => {
         try {
             const { order: data } = await OrderService.getOrderByDocumentId(id);
             order.value = data;
-        } catch(e) {
+        } catch (e) {
             notFound.value = true;
         } finally {
             loading.value = false;
@@ -35,10 +36,10 @@ export const useOrderStore = defineStore('orderStore', () => {
         loading.value = true;
         textError.value = null;
         try {
-            await OrderService.updateStatusById(id, { type: filter.type });
-        } catch(e) {
+            await OrderService.updateStatusById(id, { type: filter.type, pickupPoint: filter.pickupPoint });
+        } catch (e) {
             console.error(e);
-            textError.value = e.message || 'Произошла ошибка';
+            textError.value = e.message || "Произошла ошибка";
         } finally {
             loading.value = false;
         }
@@ -50,10 +51,10 @@ export const useOrderStore = defineStore('orderStore', () => {
         try {
             const { orders: data } = await OrderService.getOrdersMove(filter);
             orders.value = data;
-        } catch(e) {
-            textError.value = e.message || 'Ошибка сервера';
+        } catch (e) {
+            textError.value = e.message || "Ошибка сервера";
         } finally {
-            loading.value = false
+            loading.value = false;
         }
     }
 
@@ -64,16 +65,24 @@ export const useOrderStore = defineStore('orderStore', () => {
     }
     function setFilter(name, value) {
         filter[name] = value;
+        localStorage.setItem(name, JSON.stringify(value));
+    }
+    function getFilter(name) {
+        const lcValue = localStorage.getItem(name);
+        if (lcValue) return JSON.parse(lcValue);
+        return null;
     }
 
-    watch(filter, async value => {
+    watch(filter, async (value) => {
         orders.value = [];
         loading.value = true;
         if (timer.value) clearTimeout(timer.value);
         timer.value = setTimeout(() => {
             getOrders();
-        }, 500)
-    })
+        }, 500);
+
+        localStorage.setItem("pickupPoint", JSON.stringify(filter.pickupPoint));
+    });
 
     return {
         order,
@@ -85,6 +94,8 @@ export const useOrderStore = defineStore('orderStore', () => {
         updateOrder,
         newScaning,
         getOrders,
-        setFilter
-    }
-})
+        setFilter,
+        getFilter,
+        filter,
+    };
+});
